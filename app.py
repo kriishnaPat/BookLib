@@ -109,7 +109,7 @@ def profile():
     if 'loggedin' in session:
         # We need all the account info for the user so we can display it on the profile page
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute('SELECT * FROM accounts WHERE id = %s', (session['id'],))
+        cursor.execute('SELECT * FROM accounts WHERE User_id = %s', (session['User_id'],))
         account = cursor.fetchone()
         # Show the profile page with account info
         return render_template('profile.html', account=account)
@@ -119,11 +119,12 @@ def profile():
 @app.route("/pythonlogin/library", methods = ["POST", "GET"])
 def library():
     if 'loggedin' in session:
-    # if user reached route via POST (as by submitting a form via POST)
+    # if user reached route via POST (as by submitting a form via POST)    # if user reached route via POST (as by submitting a form via POST)
         if request.method == "POST":
             # ensure title of book was submitted
             if not request.form.get("title"):
                 return "sorry"
+
             # if user provided author of the book
             if request.form.get("author"):
                 """
@@ -133,6 +134,37 @@ def library():
                 return render_template("searchResults.html", books = requests.get("https://www.googleapis.com/books/v1/volumes?q=" +
                                 request.form.get("title") + "+inauthor:" + request.form.get("author") +
                                 "&key=AIzaSyBtprivgL2dXOf8kxsMHuELzvOAQn-2ZZM").json())
+
+            # if user provided publisher of the book
+            if request.form.get("publisher"):
+                """
+                return rendered result.html page with books from Google Books API published by provided publisher that match search
+                results
+                """
+                return render_template("searchResults.html", books = requests.get("https://www.googleapis.com/books/v1/volumes?q=" +
+                                request.form.get("title") + "+inpublisher:" + request.form.get("publisher") +
+                                "&key=AIzaSyBtprivgL2dXOf8kxsMHuELzvOAQn-2ZZM").json())
+
+            # if user provided author and publisher of the book
+            if request.form.get("author") and request.form.get("publisher"):
+                """
+                return rendered result.html page with books from Google Books API written by provided author and published by provided
+                publisher that match search results
+                """
+                return render_template("searchResults.html", books = requests.get("https://www.googleapis.com/books/v1/volumes?q=" +
+                                request.form.get("title") + "+inauthor:" + request.form.get("author") + "+inpublisher:" +
+                                request.form.get("publisher") + "&key=AIzaSyBtprivgL2dXOf8kxsMHuELzvOAQn-2ZZM").json())
+
+            # return rendered result.html page with books from Google Books API that match search results
+            return render_template("searchResults.html", books = requests.get("https://www.googleapis.com/books/v1/volumes?q=" +
+                                request.form.get("title") + "&key=AIzaSyBtprivgL2dXOf8kxsMHuELzvOAQn-2ZZM").json())
+
+
+        # else if user reached route via GET (as by clicking a link or via redirect)
+        else:
+
+            # return rendered search.html page
+            return render_template("library.html")
 
     # else if user reached route via GET (as by clicking a link or via redirect)
     else:

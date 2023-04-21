@@ -4,7 +4,7 @@
     Search results
 {% endblock %}
 
-{% block main %}
+{% block content %}
     {% for book in books["items"] %}
         <div id="book" class="card text-white bg-warning mb-3">
             <div class="card-header text">
@@ -28,6 +28,8 @@
                         {% endfor %}
                     {% endif %}
                 </p>
+                <button>Add Book to Read List</button>
+                <button>Add Book to Future List</button>
             </div>
         </div>
     {% endfor %}
