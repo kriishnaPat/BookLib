@@ -3,6 +3,7 @@ from flask_mysqldb import MySQL
 import MySQLdb.cursors
 import re
 import requests
+
 app = Flask(__name__)
 
 # Change this to your secret key (can be anything, it's for extra protection)
@@ -115,9 +116,26 @@ def profile():
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
 
-@app.route('/pythonlogin/library')
+@app.route("/pythonlogin/library", methods = ["POST", "GET"])
 def library():
-    return redirect(url_for('library'))
+    if 'loggedin' in session:
+    # if user reached route via POST (as by submitting a form via POST)
+        if request.method == "POST":
+            # ensure title of book was submitted
+            if not request.form.get("title"):
+                return "sorry"
+            # if user provided author of the book
+            if request.form.get("author"):
+                """
+                return rendered result.html page with books from Google Books API written by the provided author that match
+                search results
+                """
+                return render_template("searchResults.html", books = requests.get("https://www.googleapis.com/books/v1/volumes?q=" +
+                                request.form.get("title") + "+inauthor:" + request.form.get("author") +
+                                "&key=AIzaSyBtprivgL2dXOf8kxsMHuELzvOAQn-2ZZM").json())
 
-
+    # else if user reached route via GET (as by clicking a link or via redirect)
+    else:
+        # return rendered search.html page
+        return redirect(url_for('login'))
  
